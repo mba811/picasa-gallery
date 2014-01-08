@@ -353,10 +353,10 @@ function PhotoViewer() {
 
         exif.find('#time').text(photo.time);
         if (photo.exif) {
-            exif.find('#aperture').text('f/' + photo.exif.aperture);
-            exif.find('#shutter').text(photo.exif.shutter < 1 ? ('1/' + Math.round(1/photo.exif.shutter)) : (photo.exif.shutter + '"'));
-            exif.find('#iso').text('ISO' + photo.exif.iso);
-            exif.find('#focal').text(photo.exif.focal + 'mm');
+            exif.find('#aperture').toggle(!!photo.exif.aperture).text('f/' + photo.exif.aperture);
+            exif.find('#shutter').toggle(!!photo.exif.shutter).text(photo.exif.shutter < 1 ? ('1/' + Math.round(1/photo.exif.shutter)) : (photo.exif.shutter + '"'));
+            exif.find('#iso').toggle(!!photo.exif.iso).text('ISO' + photo.exif.iso);
+            exif.find('#focal').toggle(!!photo.exif.focal).text(photo.exif.focal + 'mm');
         }
         else
             exif.find('td').empty();
@@ -370,7 +370,7 @@ function PhotoViewer() {
                 //$('#photo-map').hover(function(){setTimeout(function(){map.panTo(photos[index].pos)}, 500)});
             }
             marker.setPosition(photo.pos);
-            if (!map.getBounds().contains(photo.pos)) map.panTo(photo.pos);
+            if (map.getBounds() && !map.getBounds().contains(photo.pos)) map.panTo(photo.pos);
             $('#photo-map').fadeIn();
         }
         else {
@@ -417,13 +417,8 @@ function extractExif(element) {
 }
 
 function setMarkerIcon(marker, name) {
-    if (name) {
-        marker.setIcon('http://maps.google.com/mapfiles/' + name + '.png');
-        marker.setShadow(new google.maps.MarkerImage('http://maps.google.com/mapfiles/shadow50.png', null, null, new google.maps.Point(10, 34)));
-        marker.setZIndex(1000);
-    }
-    else
-        marker.setIcon(null);
+    marker.setIcon('http://google.com/mapfiles/ms/micons/' + (name || 'red-dot') + '.png');
+    marker.setZIndex(1000);
 }
 
 function initMap() {
@@ -433,9 +428,10 @@ function initMap() {
         var pos = extractPos(this);
         if (!pos) return;
         this.marker = new google.maps.Marker({position:pos, map:map, title:$(link).find('.title > .text').text()});
+        setMarkerIcon(this.marker);
         bounds.extend(pos);
         google.maps.event.addListener(this.marker, 'click', function() {$(link).click();});
-        $(this).mouseover(function() {setMarkerIcon(this.marker, 'marker_orange');});
+        $(this).mouseover(function() {setMarkerIcon(this.marker, 'orange-dot');});
         $(this).mouseout(function() {setMarkerIcon(this.marker);});
     });
 

@@ -6,16 +6,15 @@ function facebookButton(href) {
 
 function loadVisibleThumbs(maxCount) {
     if (!maxCount) maxCount = 10000;
-	var visibleTop = $(window).scrollTop() - 150;
-    var visibleBottom = visibleTop + $(window).height() + 300;
+	  var visibleTop = $(window).scrollTop() - 150;
+    var visibleBottom = visibleTop + $(window).height() * 2.5;
 
     var found = false, count = 0;
     $('img.missing').each(function() {
         var img = $(this);
         var top = img.offset().top;
         if (top >= visibleTop && top <= visibleBottom) {
-            img.attr('src', img.attr('rel'));
-            img.removeClass('missing');
+            img.attr('src', img.attr('rel')).removeClass('missing');
             found = true;
         }
         else if (found) return false;
@@ -342,12 +341,6 @@ function PhotoViewer() {
         controls.find('.facebook-button').remove();
         controls.find('.header').prepend(facebookButton('http://' + location.host + stateURL(photo)));
 
-        if (wrapper.css('position') == 'fixed') {
-            var thumbPos = $('#' + photo.id).offset();
-            if (thumbPos.top + 150 > w.scrollTop() + w.height())
-                scrollTo(thumbPos.left, w.scrollTop() + 250);
-        }
-
         wrapper.find('.comment').fadeOut();
         wrapper.find('.comment.photo-' + photo.id).fadeIn();
 
@@ -375,6 +368,15 @@ function PhotoViewer() {
         }
         else {
             $('#photo-map').fadeOut();
+        }
+
+        if (wrapper.css('position') == 'fixed') {
+            var thumbPos = $('#' + photo.id).offset();
+            var scrollTop = w.scrollTop();
+            if (thumbPos.top + 150 > scrollTop + w.height())
+                scrollTo(thumbPos.left, thumbPos.top + 200 - w.height());
+            else if (thumbPos.top < scrollTop)
+                scrollTo(thumbPos.left, thumbPos.top - 100);
         }
     }
 }
